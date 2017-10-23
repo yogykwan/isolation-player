@@ -108,7 +108,7 @@ def custom_score_3(game, player):
 
     own_moves = len(game.get_legal_moves(player))
     opp_moves = len(game.get_legal_moves(game.get_opponent(player)))
-    return float(own_moves / opp_moves)
+    return float(own_moves / (opp_moves + 1))
 
 
 class IsolationPlayer:
@@ -248,10 +248,10 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         if self.terminal_test(game):
-            return game.utility(game._player_1)
+            return game.utility(self)
 
         if depth == 0:
-            return self.score(game, game._player_1)
+            return self.score(game, self)
 
         v = float("inf")
         for m in game.get_legal_moves():
@@ -263,10 +263,10 @@ class MinimaxPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         if self.terminal_test(game):
-            return game.utility(game._player_1)
+            return game.utility(self)
 
         if depth == 0:
-            return self.score(game, game._player_1)
+            return self.score(game, self)
 
         v = float("-inf")
         for m in game.get_legal_moves():
@@ -316,12 +316,15 @@ class AlphaBetaPlayer(IsolationPlayer):
         # in case the search fails due to timeout
         best_move = (-1, -1)
 
+        # Must use a temporary variable to deepen search depth iteratively, otherwise won't work.
+        depth = self.search_depth
+
         try:
             # The try/except block will automatically catch the exception
             # raised when the timer is about to expire.
             while True:
-                best_move = self.alphabeta(game, self.search_depth)
-                self.search_depth += 1
+                best_move = self.alphabeta(game, depth)
+                depth += 1
 
         except SearchTimeout:
             pass  # Handle any actions required after timeout as needed
@@ -394,10 +397,10 @@ class AlphaBetaPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         if self.terminal_test(game):
-            return game.utility(game._player_1)
+            return game.utility(self)
 
         if depth == 0:
-            return self.score(game, game._player_1)
+            return self.score(game, self)
 
         v = float("inf")
         for m in game.get_legal_moves():
@@ -412,10 +415,10 @@ class AlphaBetaPlayer(IsolationPlayer):
             raise SearchTimeout()
 
         if self.terminal_test(game):
-            return game.utility(game._player_1)
+            return game.utility(self)
 
         if depth == 0:
-            return self.score(game, game._player_1)
+            return self.score(game, self)
 
         v = float("-inf")
         for m in game.get_legal_moves():
